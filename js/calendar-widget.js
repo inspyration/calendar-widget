@@ -1277,6 +1277,9 @@
         this.removeReservations = function(reservations) {
             this.model.removeReservations(reservations);
         };
+        this.setDataBounds = function(date) {
+            this.model.setDataBounds(date);
+        };
     };
 
     /* CALENDAR PLUGIN DEFINITION
