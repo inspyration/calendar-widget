@@ -156,7 +156,7 @@
                  var defaultDate = this.get('defaultDate');
                  var calendar    = this.getCalendar();
                  
-                _.bindAll(this, 'addReservations', 'removeReservations', 'resolveDateConflicts', 'formatDate', 'getDefaultDates', 'copyDate', 'makeDate', 'resolveDates', 'getCalendar', 'setDataBounds', 'throwError', 'reverseFormatDate', 'getReservationsById');
+                _.bindAll(this, 'addReservations', 'removeReservations', 'resolveDateConflicts', 'formatDate', 'getDefaultDates', 'copyDate', 'makeDate', 'resolveDates', 'getCalendar', 'setDataBounds', 'throwError', 'reverseFormatDate', 'getReservationsById', 'validateDates');
 
                 calendar = $.merge(calendar, this.getDefaultDates());
                 this.set('calendar', calendar);
@@ -485,6 +485,25 @@
              * @return {Array} calendar Array of calendar data objects. */
             getDefaultDates: function() {
                 return this.resolveDates($.extend(true, {}, this.get("defaultCalendar")), $.extend(true, {}, this.get('defaultCalendarEvents')));
+            },
+
+            /** Can validate two dates in checking whether a reservation is made between them
+             * @param {Array} dates An array of start and end dates.
+             * Set a validation attribute in the calendar's data object.
+             * @return {null} true if period is empty of reservations, false otherwise. */
+            validateDates: function(dates) {
+                var sDate = new Date(dates.start);
+                var eDate = new Date(dates.end);
+                var d = new Date();
+                d.setDate(sDate.getDate() + 1);
+                for (; eDate > d; d.setDate(d.getDate() + 1)) {
+                    if (_.keys(this.get("defaultCalendar")).indexOf($.datepicker.formatDate('yy-mm-dd', d)) != -1) {
+                        $('.calendar').data().validation = false;
+                        return;
+                    }
+                }
+                $('.calendar').data().validation = true;
+                return;
             },
 
             /** Gets all reservations associated with an id.
@@ -1280,6 +1299,10 @@
         this.setDataBounds = function(date) {
             this.model.setDataBounds(date);
         };
+        this.validateDates = function(dates) {
+            this.model.validateDates(dates);
+        };
+
     };
 
     /* CALENDAR PLUGIN DEFINITION
